@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C.I.A.T</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<script>
+    function change_file(){
+        let filePath = document.getElementById("myFile").files[0].path
+        //filePath=filePath.split("\\")
+        document.getElementById('inputFilepath').innerHTML=filePath//[filePath.length-1];
+    }
+    function change_folder(){
+        let relNameFolder = document.getElementById("myFolder").files[0].webkitRelativePath.split('/')[0]
+        let folderPath = document.getElementById("myFolder").files[0].path.split(relNameFolder)[0] + relNameFolder
+        // folderPath=folderPath.split('\\')
+        document.getElementById('codeFolderpath').innerText=folderPath//[folderPath.length-1]
+        }
+    function share() {
+        // console.log({input:document.getElementById("myFile").files[0].path})
+        document.getElementById('search').disabled=true;
+        document.getElementById('search').style.opacity="50%"
+        document.getElementById('reset').disabled=true;
+        document.getElementById('reset').style.opacity="50%"
+        let relNameFolder = document.getElementById("myFolder").files[0].webkitRelativePath.split('/')[0]
+        let folderPath = document.getElementById("myFolder").files[0].path.split(relNameFolder)[0] + relNameFolder
+        let filePath = document.getElementById("myFile").files[0].path
+        // console.log({folder:document.getElementById("myFolder").files[0].path.split(relNameFolder)[0]+relNameFolder})
+        const { ipcRenderer } = require('electron')
+        document.getElementById('log').innerText = ""
+        document.getElementById('log').style.display = "block"
+        ipcRenderer.send("search", { input: filePath, file: folderPath })
+        ipcRenderer.on('logs', (event, data) => {
+            if (data.current > data.total) {
+                document.getElementById('progress').style.width = "100%"
+                document.getElementById('log').innerHTML+='<p class="blink_me" style="color: green;font-weight: bold">'+"data saved"+"</p>"
+                document.getElementById('reset').disabled=false;
+                document.getElementById('reset').style.opacity="100%"
+            }
+            else {
+                let percentage = ((data.current / data.total) * 100)
+                document.getElementById('progress').style.width = percentage + '%'
+                //document.getElementById('progress')["aria-valuenow"]=Number((data.current/data.total)*100)
+                console.log(data.logs)
+                let obj=JSON.parse(data.logs);
+                if(obj.error){
+                    document.getElementById('log').innerHTML += '<p style="color:red">'+obj.line+" : "+"("+obj.word+")-> error "+obj.error+"</p>";
+                }
+                else{
+                    document.getElementById('log').innerHTML +='<p style="color:white">'+obj.line+" : "+"("+obj.word+")->"+obj.time+" seconds "+obj.count+" times found"+"</p>";
+                }
+            }
+            var elem = document.getElementById('log');
+            elem.scrollTop = elem.scrollHeight;
+        })
+    }
+</script>
+
+<body>
+    <h1 style="background-color: rgb(234,124,52);color:white;text-align: center;">CIAT – Code Impact Assessment Tool
+    </h1>
+    <br>
+    <div style="display: flex;">
+        <div class="container" style="height:100%;width:40%">
+            <!-- <div class="row">
+            <div class="col text-white text-end" style="background-color: rgb(234,124,52)">
+                <h1 class="float-right">CIAT – Code Impact Assessment Tool</h1>
+            </div>
+        </div>
+        <br> -->
+            <div class="row">
+                <div class="col">
+                    <label>Select directory path, where source code is available </label>
+                    <br>
+                    <label style="border: 1px solid #ccc;
+                    display: inline-block;
+                     padding: 1px; 
+                    cursor: pointer;
+                    background-color:grey;
+                    width:75%;height: 25px;">
+                    <label id="codeFolderpath" style="color: white;overflow-x: scroll;width: 270px;">upload folder</label>
+                    </label>
+                    <img src="./assets/click.png" alt="" onclick='document.getElementById("myFolder").click();' style="position: absolute;margin-top: 0px;">
+                    <input type="file" id="myFolder" webkitdirectory directory multiple style="display: none;" onchange="change_folder()">
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col">
+                    <label>Select input file for impacted components</label>
+                    <br>
+                    <label style="border: 1px solid #ccc;
+                    /* display: inline-block; */
+                     padding: 1px; 
+                    cursor: pointer;
+                    background-color:grey;
+                    width:75%;height: 25px;">
+                    <label id="inputFilepath" style="color: white;overflow-x: scroll;width: 270px;">upload file</label>
+                    </label>
+                    <img src="./assets/click.png" alt="" onclick='document.getElementById("myFile").click();' style="position: absolute;margin-top: 0px;">
+                    <input type="file" id="myFile" accept=".txt" style="display: none;" onchange="change_file()">
+                </div>
+            </div>
+            <br>
+            <!-- <div class="row">
+            <div class="col text-center">
+                <input type="text" placeholder="path to search" id="file"  class="form-control" >
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col text-center">
+                <input type="text" placeholder="path to input" id="input" class="form-control" >
+            </div>
+        </div>
+        <br> -->
+            <div class="row">
+                <div class="col text-center">
+                    <div style="display: flex;">
+                        <button onclick="share()" class="btn" style="background-color: rgb(234,124,52);color:white" id="search">Run
+                            Search</button> 
+                        <div style="width: 20px;"></div>
+                        <button onclick="window.location.reload();" class="btn" style="background-color: rgb(234,124,52);color:white" id="reset">Reset</button>
+                        <!-- <progress id="progress" value="0" max="100">0</progress> -->
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col">
+                    <div class="progress">
+                        <div id="progress" class="progress-bar progress-bar-striped"
+                            role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                            style="width: 0%;background-color: rgb(234,124,52);"></div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col">
+                    <img src="./assets/logo.png" alt="">
+                </div>
+            </div>
+        </div>
+        <!-- <div class="row">
+            <div class="col overflow-auto" style="display:flex;justify-content: center;">
+                <div id="log"
+                    style="margin-left: 20px;display:none;width:500px;height:1000px;overflow:auto;background-color:black;color:white;scrollbar-base-color:gold;padding:10px;"
+                    class="overflow-auto">
+
+                </div>
+            </div>
+        </div> -->
+        <!-- <div class="container">
+        <div class="row">
+            <div class="col">
+                <label for="myFolder">Select directory path, where source code is available </label>
+                <br>
+                <input type="file" id="myFolder" webkitdirectory directory multiple>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col">
+                <label for="myFiles">Select input file for impacted components</label>
+                <br>
+                <input type="file" id="myFile" accept=".txt">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col text-center">
+                <input type="text" placeholder="path to search" id="file"  class="form-control" >
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col text-center">
+                <input type="text" placeholder="path to input" id="input" class="form-control" >
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col text-center">
+                <div style="display: flex;">
+                <button onclick="share()" class="btn" style="background-color: rgb(234,124,52);color:white">Run Search</button>
+                <div style="width: 10px;"></div>
+                <h2 id="progress">progress : 0 %</h2>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div style="  width: 3px;background: grey;height:350px"></div>
+        <div class="container" style="height: 80%;width: 50%;">
+            <!-- <br> -->
+            <!-- <div class="row">
+                <div class="col overflow-auto" style="display:flex;justify-content: center;"> -->
+                <div id="log"
+                    style="display:none;width:500px;height:325px;overflow:auto;background-color:black;color:white;scrollbar-base-color:gold;padding:10px;"
+                >
+
+                </div>
+                <!-- </div>
+            </div> -->
+        </div>
+    </div>
+</body>
+
+</html>

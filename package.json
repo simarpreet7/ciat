@@ -1,0 +1,16 @@
+{
+  "name": "ciat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cmd": "^0.1.0",
+    "electron": "^13.1.7"
+  }
+}
