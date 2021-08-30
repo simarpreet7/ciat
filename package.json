@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "cmd": "^0.1.0",
-    "electron": "^13.1.7"
+    "electron": "^13.1.7",
+    "node-cmd": "^5.0.0"
   }
 }
