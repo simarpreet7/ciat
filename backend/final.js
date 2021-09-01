@@ -191,7 +191,7 @@ fs.mkdir(folderPath, (err) => {
         return console.error(err);
     }
    
-    OutputFile=folderPath+"/"+"OutputFile_"+date //path.join(folderPath,"OutputFile_"+date)
+    OutputFile=folderPath+"/"+"OutputFile_"+date+".txt" //path.join(folderPath,"OutputFile_"+date)
     var logger = fs.createWriteStream(OutputFile, {
       flags: 'w'
      })
@@ -215,7 +215,7 @@ parentPort.on("message", data => {
 });
 }
 else{
-  OutputFile=folderPath+"/"+"OutputFile_"+date//path.join(folderPath,'output.txt')
+  OutputFile=folderPath+"/"+"OutputFile_"+date+".txt"//path.join(folderPath,'output.txt')
   var logger = fs.createWriteStream(OutputFile, {
     flags: 'w'
    })
