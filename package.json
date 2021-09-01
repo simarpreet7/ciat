@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "compile": "npx electron-packager . ciat --all && node copy.js ",
-    "backendCompile": "cd backend && pkg final.js"
+    "frontendCompile": "npx electron-packager . ciat --all && node copy.js ",
+    "backendCompile": "cd backend && pkg final.js && cd .. && cd copy/backend && pkg final.js",
+    "compile":"npm run backendCompile && npm run frontendCompile"
   },
   "author": "",
   "license": "ISC",

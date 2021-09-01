@@ -10,9 +10,26 @@
 //divider line + fit to screen + black box responsive + file upload ui
 const {app,BrowserWindow,Menu,ipcMain,screen} = require('electron')
 const cmd=require('node-cmd');
+const os=require('os')
 let count=0;
 ipcMain.on('search',(event,data)=>{
-    let cmdStr='cd backend && node final '+data.file+" "+data.input
+    if(os.type()=="Windows_NT"){
+        var cmdStr='cd backend && final-win.exe '+data.file+" "+data.input 
+    }
+    else if(os.type()=="Linux"){
+       // let cmdStr='cd backend && final-win.exe '+data.file+" "+data.input
+       console.log("linux")
+       var cmdStr = "error for linux"
+    }
+    else if(os.type()=="Darwin"){
+       // let cmdStr='cd backend && final-win.exe '+data.file+" "+data.input
+       console.log("mac os")
+       var cmdStr = "error for mac os"
+    }
+    else{
+        console.log("unknown os")
+        var cmdStr = "error for unknown os"
+    }
     console.log(cmdStr)
     const processRef=cmd.run(cmdStr);
     processRef.stdout.on(
