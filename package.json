@@ -5,14 +5,21 @@
   "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "compile": "npx electron-packager . ciat --all && node copy.js ",
+    "backendCompile": "cd backend && pkg final.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cmd": "^0.1.0",
+    "directory-tree": "^2.3.1",
     "electron": "^13.1.7",
     "electron-packager": "^15.3.0",
-    "node-cmd": "^5.0.0"
+    "lodash": "^4.17.21",
+    "node-cmd": "^5.0.0",
+    "node-xlsx": "^0.17.1",
+    "path": "^0.12.7",
+    "pkg": "^5.3.1"
   }
 }
